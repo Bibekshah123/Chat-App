@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="alert alert-info d-flex justify-content-between align-items-center" role="alert">
+        <h5 class="mb-0">ROOM: <strong>{{ room_name }}</strong></h5>
+        <a href="/accounts/logout/" class="btn btn-outline-dark btn-sm">Log Out</a>
+      </div>
+
+      <form>
+        <div class="form-group">
+          {% if messages %}
+          <div class="border rounded p-3 mb-3 bg-light" id="chatbox" style="max-height: 300px; overflow-y: scroll;">
+            {% for message in messages %}
+              <div class="chat-message {% if message.user == request.user %}text-end{% else %}text-start{% endif %}">
+                <strong>{{ message.user.username }}</strong>: {{ message.content }}<br>
+              </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="border rounded p-3 mb-3 bg-light" id="chatbox"></div>
+          <p class="text-muted">No Messages in this Room.</p>
+          {% endif %}
+        </div>
+
+        <div class="form-group mb-3">
+          <input type="text" class="form-control" id="my_input" placeholder="Enter text here" required>
+        </div>
+
+        <div class="d-grid">
+          <input type="button" class="btn btn-primary btn-lg" id="submit_button" value="Send">
+          <a class="btn btn-dark btn-lg" href="{% url "rooms"%}">back</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{{ slug|json_script:"room_slug" }}
+
+<script>
+  const chatbox = document.querySelector("#chatbox");
+
+  function scrollToBottom() {
+    chatbox.scrollTop = chatbox.scrollHeight;
+  }
+  scrollToBottom();
+
+  const roomName = JSON.parse(document.getElementById('room_slug').textContent);
+  const chatSocket = new WebSocket("ws://" + window.location.host + "/ws/" + roomName + "/");
+
+  chatSocket.onopen = function () {
+    console.log("The connection was setup successfully!");
+  };
+
+  chatSocket.onclose = function () {
+    console.log("Something unexpected happened!");
+  };
+
+  document.querySelector("#my_input").focus();
+  document.querySelector("#my_input").onkeyup = function (e) {
+    if (e.keyCode === 13) {
+      e.preventDefault();
+      document.querySelector("#submit_button").click();
+    }
+  };
+
+  document.querySelector("#submit_button").onclick = function () {
+    const messageInput = document.querySelector("#my_input").value;
+
+    if (messageInput.trim().length === 0) {
+      alert("Add some Input First Or Press Send Button!");
+    } else {
+      chatSocket.send(JSON.stringify({
+        message: messageInput,
+        username: "{{ request.user.username }}",
+        room_name: "{{ room_name }}"
+      }));
+    }
+  };
+
+  chatSocket.onmessage = function (e) {
+    const data = JSON.parse(e.data);
+    const div = document.createElement("div");
+    div.innerHTML = "<strong>" + data.username + "</strong>: " + data.message;
+
+    if (data.username === "{{ request.user.username }}") {
+      div.classList.add("chat-message", "text-end");
+    } else {
+      div.classList.add("chat-message", "text-start");
+    }
+
+    document.querySelector("#my_input").value = "";
+    document.querySelector("#chatbox").appendChild(div);
+    scrollToBottom();
+  };
+</script>
+
+{% else %}
+<div class="container mt-5">
+  <div class="alert alert-info d-flex justify-content-between align-items-center" role="alert">
+    <h5 class="mb-0">You are not logged in</h5>
+    <a href="{% url 'login' %}" class="btn btn-outline-primary btn-sm">Log In</a>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
