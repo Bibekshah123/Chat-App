@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+
+
+  <div class="container">
+    <h5 class="alert alert-info">Register</h5>
+    <div class="btn btn-light d-flex justify-content-between" style="padding: 34px 30%;">
+        
+        <form method="post">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="btn btn-primary btn-lg btn-block">Register</button>
+          <a href="{% url "login" %}"><span class="glyphicon glyphicon-log-in"></span>Log in</a>
+        </form>
+      </div>
+</div>  
+
+
+{% endblock %}
