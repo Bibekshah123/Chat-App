@@ -14,7 +14,7 @@ class SignUpView(CreateView):
 
 def rooms(request):
     rooms=Room.objects.all()
-    return render(request, "rooms.html",{"rooms":rooms})
+    return render(request, "home.html",{"rooms":rooms})
 
 def room(request,slug):
     room_name=Room.objects.get(slug=slug).name
