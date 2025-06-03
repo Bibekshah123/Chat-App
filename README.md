@@ -25,22 +25,6 @@ A real-time chat application built using **Django**, **Django Channels**, **WebS
 - **Deployment-ready:** Easily extendable for production with Daphne + Redis
 
 ---
-
-## 📁 Project Structure
-
-chat_project/
-├── chat/ # App for handling chat logic
-│ ├── consumers.py # WebSocket consumers
-│ ├── models.py # Room and Message models
-│ ├── routing.py # WebSocket URL routing
-│ └── templates/ # Templates for room and homepage
-├── chat_project/ # Django project files
-├── templates/ # Base template
-├── static/ # CSS & JS files
-├── db.sqlite3
-└── requirements.txt
-
-
 ---
 
 ## ⚙️ Setup Instructions
@@ -86,8 +70,6 @@ Send messages and open another browser to see real-time updates.
 🤝 Contribution
 Pull requests are welcome. For major changes, please open an issue first.
 
-📄 License
-This project is open-source and available under the MIT License.
  
 
 
